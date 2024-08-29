@@ -2,11 +2,10 @@
 
 This tutorial will walk through the process of peering, observing, and migrating assets from an Airflow DAG to Dagster.
 
-For now, you have to check out dagster's monorepo to get this code, but we will change that soon - thanks for your patience.
-
+First, clone the tutorial example repo locally, and enter the repo directory.
 ```bash
-gh repo clone dagster-io/dagster
-pushd dagster/examples/experimental/dagster-airlift/examples/tutorial-example
+gh repo clone dagster-io/airlift-tutorial
+pushd airlift-tutorial
 ```
 
 First we strongly recommend that you setup a fresh virtual environment and that you use `uv`.
