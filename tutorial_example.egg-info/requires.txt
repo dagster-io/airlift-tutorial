@@ -1,8 +1,0 @@
-dagster
-dagster-webserver
-dagster-airlift[core,dbt,in-airflow]
-dbt-duckdb
-pandas
-
-[test]
-pytest

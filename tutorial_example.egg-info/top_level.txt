@@ -1,2 +1,0 @@
-tutorial_example
-tutorial_example_tests
