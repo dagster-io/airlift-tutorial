@@ -1,0 +1,10 @@
+Metadata-Version: 2.1
+Name: tutorial-example
+Version: 0.0.0
+Requires-Dist: dagster
+Requires-Dist: dagster-webserver
+Requires-Dist: dagster-airlift[core,dbt,in-airflow]
+Requires-Dist: dbt-duckdb
+Requires-Dist: pandas
+Provides-Extra: test
+Requires-Dist: pytest; extra == "test"
