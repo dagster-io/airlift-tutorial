@@ -33,7 +33,7 @@ First we strongly recommend that you setup a fresh virtual environment and that 
 
 ```bash
 pip install uv
-uv venv
+uv venv --python 3.11
 source .venv/bin/activate
 ```
 
