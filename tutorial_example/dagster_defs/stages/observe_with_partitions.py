@@ -1,7 +1,8 @@
 import os
 from pathlib import Path
 
-from dagster import AssetExecutionContext, AssetSpec, Definitions
+from dagster import AssetExecutionContext, AssetSpec, DailyPartitionsDefinition, Definitions
+from dagster._time import get_current_datetime_midnight
 from dagster_airlift.core import (
     AirflowInstance,
     BasicAuthBackend,
@@ -9,6 +10,8 @@ from dagster_airlift.core import (
     build_defs_from_airflow_instance,
 )
 from dagster_dbt import DbtCliResource, DbtProject, dbt_assets
+
+PARTITIONS_DEF = DailyPartitionsDefinition(start_date=get_current_datetime_midnight())
 
 
 def dbt_project_path() -> Path:
@@ -20,6 +23,7 @@ def dbt_project_path() -> Path:
 @dbt_assets(
     manifest=dbt_project_path() / "target" / "manifest.json",
     project=DbtProject(dbt_project_path()),
+    partitions_def=PARTITIONS_DEF,
 )
 def dbt_project_assets(context: AssetExecutionContext, dbt: DbtCliResource):
     yield from dbt.cli(["build"], context=context).stream()
@@ -28,9 +32,13 @@ def dbt_project_assets(context: AssetExecutionContext, dbt: DbtCliResource):
 mapped_assets = assets_with_task_mappings(
     dag_id="rebuild_customers_list",
     task_mappings={
-        "load_raw_customers": [AssetSpec(key=["raw_data", "raw_customers"])],
+        "load_raw_customers": [
+            AssetSpec(key=["raw_data", "raw_customers"], partitions_def=PARTITIONS_DEF)
+        ],
         "build_dbt_models": [dbt_project_assets],
-        "export_customers": [AssetSpec(key="customers_csv", deps=["customers"])],
+        "export_customers": [
+            AssetSpec(key="customers_csv", deps=["customers"], partitions_def=PARTITIONS_DEF)
+        ],
     },
 )
 

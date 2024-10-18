@@ -5,7 +5,7 @@ from dagster import AssetExecutionContext, AssetSpec, Definitions
 from dagster_airlift.core import (
     AirflowInstance,
     BasicAuthBackend,
-    assets_with_task_mappings,
+    assets_with_dag_mappings,
     build_defs_from_airflow_instance,
 )
 from dagster_dbt import DbtCliResource, DbtProject, dbt_assets
@@ -25,12 +25,14 @@ def dbt_project_assets(context: AssetExecutionContext, dbt: DbtCliResource):
     yield from dbt.cli(["build"], context=context).stream()
 
 
-mapped_assets = assets_with_task_mappings(
-    dag_id="rebuild_customers_list",
-    task_mappings={
-        "load_raw_customers": [AssetSpec(key=["raw_data", "raw_customers"])],
-        "build_dbt_models": [dbt_project_assets],
-        "export_customers": [AssetSpec(key="customers_csv", deps=["customers"])],
+# Instead of mapping assets to individual tasks, we map them to the entire DAG.
+mapped_assets = assets_with_dag_mappings(
+    dag_mappings={
+        "rebuild_customers_list": [
+            AssetSpec(key=["raw_data", "raw_customers"]),
+            dbt_project_assets,
+            AssetSpec(key="customers_csv", deps=["customers"]),
+        ],
     },
 )
 
